@@ -1,5 +1,5 @@
 name: 'Auto Review by OpenAI'
-description: 'This action is an action that uses OpenAI to perform an auto-review.'
+description: 'This action is an automated review action using OpenAI or Azure OpenAI.'
 inputs:
   openai-api-key:
     description: >
@@ -8,27 +8,15 @@ inputs:
   model:
     description: >
       Specifies the ChatGPT model to be used.
-      ex) gpt-4, gpt-3.5, gpt-3.5-turbo
-    required: true
-    default: gpt-3.5-turbo
-  base-sha:
-    description: >
-      Specifies the SHA of the base commit.
-      By default, github.event.pull_request.base.sha is specified.
-    required: true
-    default: ${{ github.event.pull_request.base.sha }}
+      ex) gpt-4o, gpt-4o-mini, o3-mini
+    required: false
+    default: o3-mini
   github-token:
     description: >
       Specify a GitHub token.
       By default, github.token is specified.
     required: true
     default: ${{ github.token }}
-  pull-request-url:
-    description: >
-      Specify the URL of the pull request.
-      By default, github.event.pull_request.html_url is specified.
-    required: true
-    default: ${{ github.event.pull_request.html_url }}
   target:
     description: >
       Specify the extension of the file to be reviewed.
@@ -42,13 +30,62 @@ inputs:
       ex) 日本語
     required: true
     default: English
+  max-tokens:
+    description: >
+      The maximum number of tokens to generate.
+      By default, 3000.
+    required: false
+  temperature:
+    description: >
+      The sampling temperature to use that controls the apparent creativity of generated completions.
+      Higher values will make output more random while lower values will make results more focused
+      and deterministic.
+      It is not recommended to modify temperature and top_p for the same completions request as the
+      interaction of these two settings is difficult to predict.
+    required: false
+  top-p:
+    description: >
+      An alternative to sampling with temperature called nucleus sampling. This value causes the
+      model to consider the results of tokens with the provided probability mass. As an example, a
+      value of 0.15 will cause only the tokens comprising the top 15% of probability mass to be
+      considered.
+      It is not recommended to modify temperature and top_p for the same completions request as the
+      interaction of these two settings is difficult to predict.
+    required: false
+  resource-name:
+    description: >
+      Specify the resource name when using Azure OpenAI.
+      The resource name corresponds to the <resource name> in the URL of the Azure OpenAI resource.
+      https://<resource name>.openai.azure.com/
+    required: false
+  deployment-id:
+    description: >
+      Specify a deployment name when using Azure OpenAI.
+    required: false
+  optimize:
+    description: >
+      Specifies whether to optimize the review of pull requests.
+      If optimized, only the differences from the parent commit are reviewed.
+      If not optimized, all differences from the base branch are reviewed.
+    required: false
+    default: true
+  display-suggestions:
+    description: >
+      You can specify whether to display improvement suggestions.
+      ex) false
+    required: true
+    default: true
+  api-version:
+    description: >
+      When using Azure OpenAI, you must specify the API version to be used.
+    required: false
 outputs:
   output:
     description: >
       Outputs the results of the auto-review.
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
-  icon: "box"
-  color: "orange"
+  icon: 'box'
+  color: 'orange'
